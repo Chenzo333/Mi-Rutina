@@ -143,7 +143,11 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .bname.editable{cursor:pointer;border-bottom:1px dashed var(--text4);display:inline-block;}
 .bname.editable:hover{border-color:var(--text3);}
 .bname-input{font-size:14px;font-weight:500;color:var(--text);background:var(--surface3);border:1px solid var(--gold-border);border-radius:4px;padding:2px 6px;width:100%;outline:none;font-family:'DM Sans',sans-serif;}
-.bdesc{font-size:12px;color:var(--text2);margin-top:3px;font-weight:300;border-radius:4px;padding:1px 3px;border:1px solid transparent;transition:all .1s;}
+.bdesc{font-size:12px;color:var(--text2);margin-top:3px;border-radius:4px;padding:1px 3px;border:1px solid transparent;transition:all .1s;line-height:1.5;}
+.bdesc b,.bdesc strong{font-weight:700;color:inherit;}
+.bdesc i,.bdesc em{font-style:italic;}
+.bdesc u{text-decoration:underline;text-decoration-color:currentColor;}
+.bdesc *{text-decoration-color:currentColor;}
 .bdesc.editable{cursor:text;}
 .bdesc.editable:hover{background:var(--surface3);border-color:var(--border2);}
 .bdesc[contenteditable="true"]{outline:none;background:var(--surface3);border-color:var(--gold-border);color:var(--text);}
@@ -1669,13 +1673,17 @@ function rteColor(color){
   const el=document.getElementById('rte-content');
   if(!el)return;
   el.focus();
-  // Save selection, apply color
   const sel=window.getSelection();
   if(!sel||sel.rangeCount===0)return;
   document.execCommand('styleWithCSS',false,true);
   document.execCommand('foreColor',false,color);
+  // Also set text-decoration-color to match font color
+  document.execCommand('fontSize',false,'3'); // trigger style recalc
+  const spans=el.querySelectorAll('span[style*="color"]');
+  spans.forEach(s=>{
+    if(s.style.color)s.style.textDecorationColor=s.style.color;
+  });
   document.execCommand('styleWithCSS',false,false);
-  // Update active color indicator
   document.querySelectorAll('.rte-color-btn').forEach(b=>b.classList.remove('rte-color-active'));
   document.getElementById('rtec-'+color.slice(1))?.classList.add('rte-color-active');
 }
