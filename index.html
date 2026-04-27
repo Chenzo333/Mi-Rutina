@@ -127,11 +127,11 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 
 /* BLOCK */
 .block-wrap{position:relative;}
-.block-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--radius);border:1px solid var(--border);border-left:3px solid;transition:all .15s;position:relative;background:var(--surface2);padding-right:80px;}
+.block-item{display:flex;align-items:flex-start;gap:10px;padding:9px 12px;border-radius:var(--radius);border:1px solid var(--border);border-left:3px solid;transition:all .15s;position:relative;background:var(--surface2);padding-right:80px;}
 .block-item.editable-block:hover{border-color:var(--border2);}
 .block-item.drag-target{border-style:dashed!important;border-color:var(--gold)!important;}
 
-.block-time-col{flex-shrink:0;width:auto;align-self:flex-start;padding-top:2px;}
+.block-time-col{flex-shrink:0;width:110px;min-width:110px;align-self:flex-start;padding-top:3px;}
 .btime{font-family:'Bebas Neue',sans-serif;font-size:14px;font-weight:400;color:var(--text);letter-spacing:1px;}
 .btime-arrow{font-size:10px;color:var(--text3);line-height:1;vertical-align:middle;margin:0 1px;}
 .btime.editable{cursor:pointer;border-bottom:1px dashed var(--text4);transition:border-color .1s;}
@@ -1418,7 +1418,18 @@ function confirmAddTag(day,bid){
   const b=getBlock(day,bid);if(!b)return;
   if(!b.tags)b.tags=[];
   b.tags.push(mkTag(label,color));
-  save();closePopups();renderMain();
+  closePopups();
+  if(b.recId){
+    const r=(S.recurring||[]).find(x=>x.id===b.recId);
+    if(r&&confirm(`¿Agregar el tag "${label}" a todos los días con "${b.title}"?
+
+OK = Todos
+Cancelar = Solo ${day}`)){
+      r.tags=clone(b.tags);
+      applyAllRecurring([b.recId]);
+    }
+  }
+  save();renderMain();
 }
 function confirmEditTag(day,bid,tid){
   const pop=document.getElementById('tp-'+day+'-'+bid);if(!pop)return;
@@ -1426,9 +1437,34 @@ function confirmEditTag(day,bid,tid){
   const color=pop.dataset.color;
   const b=getBlock(day,bid);if(!b)return;
   const tag=(b.tags||[]).find(t=>t.id==tid);if(tag){tag.label=label;tag.color=color;}
-  save();closePopups();renderMain();
+  closePopups();
+  if(b.recId){
+    const r=(S.recurring||[]).find(x=>x.id===b.recId);
+    if(r&&confirm(`¿Aplicar el cambio de tag a todos los días con "${b.title}"?
+
+OK = Todos
+Cancelar = Solo ${day}`)){
+      r.tags=clone(b.tags);
+      applyAllRecurring([b.recId]);
+    }
+  }
+  save();renderMain();
 }
-function delTag(day,bid,tid){const b=getBlock(day,bid);if(b){b.tags=(b.tags||[]).filter(t=>t.id!=tid);save();renderMain();}}
+function delTag(day,bid,tid){
+  const b=getBlock(day,bid);if(!b)return;
+  b.tags=(b.tags||[]).filter(t=>t.id!=tid);
+  if(b.recId){
+    const r=(S.recurring||[]).find(x=>x.id===b.recId);
+    if(r&&confirm(`¿Eliminar este tag de todos los días con "${b.title}"?
+
+OK = Todos
+Cancelar = Solo ${day}`)){
+      r.tags=clone(b.tags);
+      applyAllRecurring([b.recId]);
+    }
+  }
+  save();renderMain();
+}
 
 /* DRAG & DROP */
 function onTDS(e,day,id){dragId=id;dragDay=day;dragTT=null;e.dataTransfer.effectAllowed='move';setTimeout(()=>{document.getElementById('tsk-'+day+'-'+id)?.classList.add('dragging');},0);}
