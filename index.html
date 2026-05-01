@@ -16,7 +16,7 @@
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{getFirestore,initializeFirestore,persistentLocalCache,doc,getDoc,setDoc,onSnapshot}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const fbCfg={apiKey:"AIzaSyBKjBrF9Rj2uJl65QGCZrUlLEYg1RwZw6c",authDomain:"mi-rutina-73832.firebaseapp.com",projectId:"mi-rutina-73832",storageBucket:"mi-rutina-73832.firebasestorage.app",messagingSenderId:"278889311923",appId:"1:278889311923:web:adb8d4273e48207c160ac6"};
+const fbCfg={apiKey:"AIzaSyBKjBrF9Rj2uJl65QGCZrUlLEYg1RwZw6c",authDomain:"chenzo333.github.io",projectId:"mi-rutina-73832",storageBucket:"mi-rutina-73832.firebasestorage.app",messagingSenderId:"278889311923",appId:"1:278889311923:web:adb8d4273e48207c160ac6"};
 const app=initializeApp(fbCfg);
 const auth=getAuth(app);
 let db;
@@ -1939,7 +1939,7 @@ toggleTheme=function(){
 function doSignIn(){
   if(!window._fb){alert('Cargando, intentá de nuevo.');return;}
   const{auth,provider,signInWithPopup,signInWithRedirect}=window._fb;
-  const mobile=window.innerWidth<=900||window.matchMedia('(display-mode:standalone)').matches||(window.navigator.standalone===true);
+  const mobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   if(mobile){
     signInWithRedirect(auth,provider).catch(e=>console.error('Redirect error:',e));
   }else{
