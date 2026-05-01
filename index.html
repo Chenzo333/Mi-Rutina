@@ -1932,19 +1932,15 @@ toggleTheme=function(){
 /* ── FIREBASE AUTH ── */
 function doSignIn(){
   if(!window._fb){alert('Cargando, intentá de nuevo.');return;}
-  const{auth,provider,signInWithPopup,signInWithRedirect}=window._fb;
-  const mobile=window.innerWidth<=900||window.matchMedia('(display-mode:standalone)').matches||(window.navigator.standalone===true);
-  if(mobile){
-    signInWithRedirect(auth,provider).catch(e=>console.error('Redirect error:',e));
-  }else{
-    signInWithPopup(auth,provider).catch(e=>{
-      console.error('Popup error:',e.code);
-      if(e.code==='auth/popup-blocked'){
-        // Fallback to redirect
-        signInWithRedirect(auth,provider).catch(e2=>console.error(e2));
-      }
-    });
-  }
+  const{auth,provider,signInWithPopup}=window._fb;
+  signInWithPopup(auth,provider).catch(e=>{
+    console.error('Login error:',e.code,e.message);
+    if(e.code==='auth/popup-blocked'){
+      alert('El popup fue bloqueado. Permití popups para este sitio en tu navegador.');
+    }else if(e.code!=='auth/popup-closed-by-user'){
+      alert('Error al iniciar sesión: '+e.message);
+    }
+  });
 }
 function doSignOut(){
   if(!window._fb)return;
