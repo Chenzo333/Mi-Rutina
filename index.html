@@ -16,7 +16,7 @@
 import{initializeApp}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import{getAuth,GoogleAuthProvider,signInWithPopup,signInWithRedirect,getRedirectResult,signOut,onAuthStateChanged}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import{getFirestore,initializeFirestore,persistentLocalCache,doc,getDoc,setDoc,onSnapshot}from'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-const fbCfg={apiKey:"AIzaSyBKjBrF9Rj2uJl65QGCZrUlLEYg1RwZw6c",authDomain:"chenzo333.github.io",projectId:"mi-rutina-73832",storageBucket:"mi-rutina-73832.firebasestorage.app",messagingSenderId:"278889311923",appId:"1:278889311923:web:adb8d4273e48207c160ac6"};
+const fbCfg={apiKey:"AIzaSyBKjBrF9Rj2uJl65QGCZrUlLEYg1RwZw6c",authDomain:"mi-rutina-73832.firebaseapp.com",projectId:"mi-rutina-73832",storageBucket:"mi-rutina-73832.firebasestorage.app",messagingSenderId:"278889311923",appId:"1:278889311923:web:adb8d4273e48207c160ac6"};
 const app=initializeApp(fbCfg);
 const auth=getAuth(app);
 let db;
@@ -1938,18 +1938,17 @@ toggleTheme=function(){
 /* ── FIREBASE AUTH ── */
 function doSignIn(){
   if(!window._fb){alert('Cargando, intentá de nuevo.');return;}
-  const{auth,provider,signInWithPopup,signInWithRedirect}=window._fb;
-  const mobile=/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  if(mobile){
-    signInWithRedirect(auth,provider).catch(e=>console.error('Redirect error:',e));
-  }else{
-    signInWithPopup(auth,provider).catch(e=>{
-      console.error('Popup error:',e.code);
-      if(e.code==='auth/popup-blocked'){
-        signInWithRedirect(auth,provider).catch(e2=>console.error(e2));
-      }
-    });
-  }
+  const{auth,provider,signInWithPopup}=window._fb;
+  signInWithPopup(auth,provider).then(result=>{
+    console.log('Login OK:',result.user.email);
+  }).catch(e=>{
+    console.error('Login error:',e.code,e.message);
+    if(e.code==='auth/popup-blocked'){
+      alert('El popup fue bloqueado. Permití popups para este sitio.');
+    }else if(e.code!=='auth/popup-closed-by-user'){
+      alert('Error: '+e.message);
+    }
+  });
 }
 function doSignOut(){
   if(!window._fb)return;
