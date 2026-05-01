@@ -2009,24 +2009,37 @@ if(!S.weekFilter)S.weekFilter='all';
 function startApp(){
   if(!window._fb){setTimeout(startApp,100);return;}
   const{auth,onAuthStateChanged,getRedirectResult}=window._fb;
-  // Handle redirect result (mobile login)
-  getRedirectResult(auth).then(r=>{
-    // onAuthStateChanged handles the rest
-  }).catch(e=>console.error('Redirect result error:',e));
-  // Auth state listener
-  onAuthStateChanged(auth,user=>{
-    if(user){
+  // On mobile, getRedirectResult MUST resolve before we listen for auth state
+  // Otherwise the redirect result is lost and user sees login screen again
+  getRedirectResult(auth).then(result=>{
+    if(result&&result.user){
+      // Got redirect result — user is logged in
       document.getElementById('login-screen').style.display='none';
-      updateUserUI(user);
+      updateUserUI(result.user);
       if(!window._appLoaded){
         window._appLoaded=true;
-        loadForUser(user.uid);
+        loadForUser(result.user.uid);
         updateHoyManana();
       }
-    }else{
-      window._appLoaded=false;
-      document.getElementById('login-screen').style.display='flex';
     }
+  }).catch(e=>{
+    console.error('Redirect result error:',e);
+  }).finally(()=>{
+    // Always set up auth state listener after redirect check
+    onAuthStateChanged(auth,user=>{
+      if(user){
+        document.getElementById('login-screen').style.display='none';
+        updateUserUI(user);
+        if(!window._appLoaded){
+          window._appLoaded=true;
+          loadForUser(user.uid);
+          updateHoyManana();
+        }
+      }else{
+        window._appLoaded=false;
+        document.getElementById('login-screen').style.display='flex';
+      }
+    });
   });
 }
 startApp();
