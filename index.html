@@ -259,7 +259,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   .corner,.sidebar{display:none!important;}
   body{overflow:hidden;}
 
-  .shell{flex-direction:column;height:100dvh;height:100vh;}
+  .shell{flex-direction:column;height:100dvh;height:100vh;padding-top:env(safe-area-inset-top);}
   .main{flex:1;overflow:hidden;display:flex;flex-direction:column;}
 
   /* Mobile header */
@@ -303,7 +303,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   .tlbl{font-size:13px;}
 
   /* Page content more breathing room */
-  .page-content{padding:10px 10px;padding-bottom:80px;}
+  .page-content{padding:10px 10px;padding-bottom:calc(80px + env(safe-area-inset-bottom));}
   .panel-body{padding:8px;}
   .panel-head{padding:10px 12px;}
 
@@ -327,7 +327,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   .mob-day-pill.active{background:var(--gold);color:#0C0C0C;border-color:var(--gold);}
 
   /* Bottom tab bar */
-  .mob-tabbar{display:flex;flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:0;height:60px;padding-bottom:env(safe-area-inset-bottom);}
+  .mob-tabbar{display:flex;flex-shrink:0;background:var(--surface);border-top:1px solid var(--border);padding:0 0 env(safe-area-inset-bottom) 0;height:calc(60px + env(safe-area-inset-bottom));}
   .mob-tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;color:var(--text3);transition:color .15s;border:none;background:none;font-family:'DM Sans',sans-serif;}
   .mob-tab.active{color:var(--gold);}
   .mob-tab-icon{font-size:20px;line-height:1;}
