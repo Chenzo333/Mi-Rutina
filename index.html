@@ -493,17 +493,7 @@ const DEF={
 const DEF_TASKS={Lunes:[],Martes:[],Miércoles:[],Jueves:[],Viernes:[],Sábado:[],Domingo:[]};
 
 // Default recurring templates — these are the source of truth for fixed blocks
-const DEF_REC=[
-  {id:'r1',title:'Bloque espiritual',desc:'Meditación · metas · visualización · afirmaciones · lectura',time:'07:30',timeEnd:null,cat:'espiritual',barColor:'#C4922A',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-  {id:'r2',title:'Bloque espiritual completo',desc:'Sin apuros · todo el tiempo',time:'09:00',timeEnd:null,cat:'espiritual',barColor:'#C4922A',days:['Sábado','Domingo']},
-  {id:'r3',title:'Pre mercado',desc:'Análisis y preparación de la sesión',time:'09:30',timeEnd:'10:30',cat:'trading',barColor:'#3A8FC4',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-  {id:'r4',title:'Sesión operativa',desc:'Trading en vivo',time:'10:30',timeEnd:'12:00',cat:'trading',barColor:'#3A8FC4',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-  {id:'r5',title:'Journal de sesión',desc:'Registro inmediato post operativa',time:'12:00',timeEnd:null,cat:'trading',barColor:'#3A8FC4',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-  {id:'r6',title:'Academia',desc:'Admin · dirección · facturación según etapa del mes',time:'13:30',timeEnd:null,cat:'academia',barColor:'#5E9E6A',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-  {id:'r7',title:'Gimnasio',desc:'Entrenamiento hasta ~19:30',time:'18:00',timeEnd:'19:30',cat:'gym',barColor:'#C46A3A',days:['Lunes','Martes','Miércoles','Jueves']},
-  {id:'r8',title:'Estudio — Rap',desc:'Escribir · producir · grabar',time:'21:00',timeEnd:null,cat:'rap',barColor:'#8A64B4',days:['Viernes','Sábado','Domingo']},
-  {id:'r9',title:'Revisión y organización',desc:'¿Qué logré? · 3 prioridades de mañana',time:'00:30',timeEnd:null,cat:'personal',barColor:'#7A7A7A',days:['Lunes','Martes','Miércoles','Jueves','Viernes']},
-];
+const DEF_REC=[];
 
 let S={view:'day',day:(['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'][new Date().getDay()]),weekExpanded:false,blocks:{},tasks:{},nextId:2000,recurring:[]};
 let dragId=null,dragDay=null,openCP=null,openTP=null;
