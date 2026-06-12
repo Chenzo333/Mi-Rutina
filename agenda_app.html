@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda · NEXO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Agenda">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="application-name" content="Agenda">
+<meta name="theme-color" content="#ffffff">
+<meta name="description" content="Agenda diaria · NEXO">
+<link rel="manifest" id="manifestLink">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --white: #ffffff;
+  --black: #0a0a0a;
+  --gray-50:  #fafafa;
+  --gray-100: #f2f2f2;
+  --gray-200: #e4e4e4;
+  --gray-300: #cacaca;
+  --gray-400: #a0a0a0;
+  --gray-500: #6e6e6e;
+  --blue: #2563a8;
+  --blue-light: rgba(37,99,168,0.07);
+  --blue-mid: rgba(37,99,168,0.15);
+  --green: #1a7a4a;
+  --font: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+  --radius: 4px;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--white);
+  color: var(--black);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── NAV ── */
+.nav {
+  position: sticky; top: 0; z-index: 50;
+  background: var(--white);
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center;
+  padding: 0 48px; height: 52px;
+  gap: 0;
+}
+.nav-logo {
+  font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--black);
+  margin-right: 40px;
+}
+.nav-logo span { color: var(--blue); }
+.nav-tabs { display: flex; gap: 0; }
+.nav-tab {
+  padding: 0 18px; height: 52px;
+  display: flex; align-items: center;
+  font-size: 12px; font-weight: 500; letter-spacing: 0.3px;
+  color: var(--gray-400); cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color .15s, border-color .15s;
+  background: none; border-top: none; border-left: none; border-right: none;
+  font-family: var(--font);
+}
+.nav-tab:hover { color: var(--black); }
+.nav-tab.active { color: var(--black); border-bottom-color: var(--blue); }
+
+/* ── PÁGINAS ── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── LAYOUT COMÚN ── */
+.container { max-width: 680px; margin: 0 auto; padding: 56px 40px 80px; }
+
+/* ── HEADER DÍA ── */
+.day-header { margin-bottom: 48px; }
+.day-eyebrow {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--blue);
+  margin-bottom: 10px;
+}
+.day-title {
+  font-size: 26px; letter-spacing: -0.5px; line-height: 1.1;
+  color: var(--black);
+}
+.day-title strong { font-weight: 700; }
+.day-title .light { font-weight: 300; color: var(--gray-500); }
+.day-meta {
+  margin-top: 20px;
+  display: flex; align-items: center; gap: 20px;
+}
+.day-progress-wrap {
+  flex: 1; max-width: 200px;
+  height: 3px; background: var(--gray-200); border-radius: 2px; overflow: hidden;
+}
+.day-progress-bar {
+  height: 100%; background: var(--blue); border-radius: 2px;
+  transition: width .4s ease;
+}
+.day-score-label {
+  font-size: 11px; font-weight: 600; color: var(--blue);
+  min-width: 36px;
+}
+.day-score-tasks {
+  font-size: 11px; color: var(--gray-400); letter-spacing: 0.2px;
+}
+
+/* ── BLOQUE HORARIO ── */
+.block { margin-bottom: 40px; }
+.block-label {
+  font-size: 8px; font-weight: 700; letter-spacing: 3.5px;
+  text-transform: uppercase; color: var(--gray-400);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--gray-200);
+  margin-bottom: 0;
+  display: flex; align-items: center; gap: 8px;
+}
+.block-label::before {
+  content: '';
+  width: 3px; height: 3px; border-radius: 50%;
+  background: var(--blue); flex-shrink: 0;
+}
+
+/* ── ITEM ── */
+.item {
+  display: grid;
+  grid-template-columns: 52px 14px 1fr 28px;
+  align-items: center;
+  gap: 0 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background .1s;
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+.item:last-child { border-bottom: none; }
+.item:hover { background: var(--blue-light); padding-left: 8px; padding-right: 8px; margin: 0 -8px; }
+.item.done { opacity: 0.45; }
+.item.done .item-name { text-decoration: line-through; }
+
+.item-time {
+  font-size: 11px; font-weight: 600;
+  color: var(--blue); letter-spacing: 0.3px;
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.item-time.no-time { color: var(--gray-300); font-size: 13px; font-weight: 300; }
+
+.item-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--gray-300); justify-self: center;
+  transition: background .2s;
+}
+.item.done .item-dot { background: var(--blue); }
+
+.item-name {
+  font-size: 13.5px; font-weight: 400;
+  color: var(--black); letter-spacing: -0.1px;
+  transition: color .2s;
+}
+
+/* ── CHECKBOX CUSTOM ── */
+.item-check {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 1.5px solid var(--gray-300);
+  background: transparent; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all .15s; flex-shrink: 0; justify-self: end;
+}
+.item-check:hover { border-color: var(--blue); }
+.item-check.checked {
+  background: var(--blue); border-color: var(--blue);
+}
+.item-check.checked::after {
+  content: '';
+  width: 5px; height: 9px;
+  border-right: 1.5px solid white;
+  border-bottom: 1.5px solid white;
+  transform: rotate(45deg) translate(-1px, -1px);
+  display: block;
+}
+
+/* ── SCORE SEMANAL (vista Semana) ── */
+.week-header { margin-bottom: 40px; }
+.week-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.week-header .sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+.week-big-score {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 40px;
+}
+.week-big-score .num {
+  font-size: 64px; font-weight: 700; letter-spacing: -3px;
+  color: var(--black); line-height: 1;
+}
+.week-big-score .unit {
+  font-size: 20px; font-weight: 300; color: var(--gray-400);
+}
+.week-big-score .label {
+  font-size: 11px; font-weight: 600; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 1.5px;
+  margin-left: 4px; align-self: center;
+}
+
+.days-grid { display: flex; flex-direction: column; gap: 0; }
+.day-row {
+  display: grid; grid-template-columns: 80px 1fr 48px;
+  align-items: center; gap: 16px;
+  padding: 14px 0; border-bottom: 1px solid var(--gray-100);
+}
+.day-row:last-child { border-bottom: none; }
+.day-row .dname {
+  font-size: 12px; font-weight: 600; letter-spacing: 0.3px;
+  color: var(--gray-500); text-transform: uppercase;
+}
+.day-row .dname.today { color: var(--blue); }
+.day-bar-wrap { height: 3px; background: var(--gray-100); border-radius: 2px; overflow: hidden; }
+.day-bar { height: 100%; border-radius: 2px; background: var(--blue); transition: width .4s; }
+.day-pct {
+  font-size: 12px; font-weight: 600; color: var(--black);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.day-pct.zero { color: var(--gray-300); }
+
+/* ── HISTORIAL ── */
+.hist-header { margin-bottom: 40px; }
+.hist-header h2 { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+.hist-header .sub { font-size: 12px; color: var(--gray-400); margin-top: 4px; }
+
+.hist-section-title {
+  font-size: 9px; font-weight: 700; letter-spacing: 3px;
+  text-transform: uppercase; color: var(--gray-400);
+  margin-bottom: 16px; margin-top: 40px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--gray-200);
+}
+.hist-section-title:first-of-type { margin-top: 0; }
+
+.hist-row {
+  display: grid; grid-template-columns: 1fr 80px 60px;
+  align-items: center; gap: 16px;
+  padding: 12px 0; border-bottom: 1px solid var(--gray-100);
+}
+.hist-row:last-child { border-bottom: none; }
+.hist-label { font-size: 13px; color: var(--black); font-weight: 400; }
+.hist-bar-wrap { height: 2px; background: var(--gray-100); border-radius: 2px; overflow: hidden; }
+.hist-bar { height: 100%; border-radius: 2px; background: var(--blue); }
+.hist-pct {
+  font-size: 13px; font-weight: 600; color: var(--black);
+  text-align: right; font-variant-numeric: tabular-nums;
+}
+.hist-pct.perfect { color: var(--green); }
+.hist-empty {
+  font-size: 13px; color: var(--gray-300); padding: 24px 0;
+  text-align: center; font-style: italic;
+}
+
+/* ── RESET BTN ── */
+.reset-btn {
+  margin-top: 48px; padding: 10px 20px;
+  border: 1px solid var(--gray-200); border-radius: var(--radius);
+  background: transparent; color: var(--gray-400);
+  font-family: var(--font); font-size: 12px; font-weight: 500;
+  cursor: pointer; transition: all .15s; letter-spacing: 0.3px;
+}
+.reset-btn:hover { border-color: var(--gray-400); color: var(--black); }
+
+/* ── FOOTER ── */
+.footer {
+  max-width: 680px; margin: 0 auto;
+  padding: 0 40px 40px;
+  display: flex; align-items: center; gap: 16px;
+}
+.footer-brand {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--gray-300); white-space: nowrap;
+}
+.footer-line { flex: 1; height: 1px; background: var(--gray-100); }
+</style>
+
+<script>
+// ── PWA MANIFEST ──
+(function() {
+  const manifest = {
+    name: 'Agenda · NEXO',
+    short_name: 'Agenda',
+    description: 'Agenda diaria NEXO',
+    start_url: './',
+    display: 'standalone',
+    background_color: '#ffffff',
+    theme_color: '#ffffff',
+    orientation: 'portrait-primary',
+    icons: [{
+      src: "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📋</text></svg>",
+      sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable'
+    }]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/json'});
+  document.getElementById('manifestLink').href = URL.createObjectURL(blob);
+})();
+
+// ── SERVICE WORKER ──
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('./sw.js')
+    .then(() => console.log('SW registrado'))
+    .catch(e => console.info('SW no disponible:', e.message));
+}
+</script>
+
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="nav-logo">NEXO <span>·</span> Agenda</div>
+  <div class="nav-tabs">
+    <button class="nav-tab active" onclick="showPage('hoy')">Hoy</button>
+    <button class="nav-tab" onclick="showPage('semana')">Semana</button>
+    <button class="nav-tab" onclick="showPage('historial')">Historial</button>
+  </div>
+</nav>
+
+<!-- HOY -->
+<div class="page active" id="page-hoy">
+  <div class="container">
+    <div class="day-header">
+      <div class="day-eyebrow">Agenda del día</div>
+      <div class="day-title">
+        <strong id="todayName">Lunes</strong>
+        <span class="light" id="todayDate"> 12 de junio · 2026</span>
+      </div>
+      <div class="day-meta">
+        <div class="day-progress-wrap">
+          <div class="day-progress-bar" id="dayProgressBar" style="width:0%"></div>
+        </div>
+        <div class="day-score-label" id="dayScoreLabel">0%</div>
+        <div class="day-score-tasks" id="dayScoreTasks">0 de 0 tareas</div>
+      </div>
+    </div>
+    <div id="todayBlocks"></div>
+  </div>
+  <div class="footer">
+    <div class="footer-brand">Agustín · NEXO</div>
+    <div class="footer-line"></div>
+  </div>
+</div>
+
+<!-- SEMANA -->
+<div class="page" id="page-semana">
+  <div class="container">
+    <div class="week-header">
+      <h2>Esta semana</h2>
+      <div class="sub" id="weekRange"></div>
+    </div>
+    <div class="week-big-score">
+      <div class="num" id="weekScoreNum">0</div>
+      <div class="unit">%</div>
+      <div class="label">completado</div>
+    </div>
+    <div class="days-grid" id="daysGrid"></div>
+    <button class="reset-btn" onclick="confirmReset()">Resetear semana manualmente</button>
+  </div>
+</div>
+
+<!-- HISTORIAL -->
+<div class="page" id="page-historial">
+  <div class="container">
+    <div class="hist-header">
+      <h2>Historial</h2>
+      <div class="sub">Resumen de semanas y meses anteriores</div>
+    </div>
+    <div id="historialContent"></div>
+  </div>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+// DATOS
+// ══════════════════════════════════════════════════
+const DIAS = ['Lunes','Martes','Miércoles','Jueves','Viernes'];
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+// Tareas base (lunes a jueves)
+const TAREAS_BASE = [
+  { bloque: 'Mañana', hora: '08:00', nombre: 'Despertar' },
+  { bloque: 'Mañana', hora: '08:15', nombre: 'Taller creativo' },
+  { bloque: 'Mañana', hora: '09:20', nombre: 'Lectura' },
+  { bloque: 'Mercado', hora: '10:00', nombre: 'Pre-mercado' },
+  { bloque: 'Mercado', hora: '10:30', nombre: 'Sesión operativa' },
+  { bloque: 'Mercado', hora: '12:00', nombre: 'Journal de trading' },
+  { bloque: 'Mediodía', hora: '13:00', nombre: 'Almuerzo' },
+  { bloque: 'Mediodía', hora: '15:00', nombre: 'Luz MYC' },
+  { bloque: 'Tarde', hora: '18:00', nombre: 'Gimnasio' },
+  { bloque: 'Tarde', hora: '19:30', nombre: 'Estudiar trading' },
+  { bloque: 'Noche', hora: '22:30', nombre: 'Cena' },
+  { bloque: 'Noche', hora: '', nombre: 'Organizar día' },
+  { bloque: 'Noche', hora: '12:30', nombre: 'Lectura' },
+  { bloque: 'Noche', hora: '01:00', nombre: 'Taller creativo' },
+];
+
+// Viernes: sin Gimnasio
+const TAREAS_VIERNES = TAREAS_BASE.filter(t => t.nombre !== 'Gimnasio');
+
+function tareasParaDia(diaSemana) {
+  // diaSemana: 0=Lunes...4=Viernes
+  return diaSemana === 4 ? TAREAS_VIERNES : TAREAS_BASE;
+}
+
+// ══════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════
+function getWeekKey(date) {
+  const d = new Date(date);
+  // Lunes de esa semana
+  const day = d.getDay();
+  const diff = (day === 0 ? -6 : 1 - day);
+  d.setDate(d.getDate() + diff);
+  return `${d.getFullYear()}-W${String(getWeekNumber(d)).padStart(2,'0')}`;
+}
+
+function getWeekNumber(d) {
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const dayNum = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date - yearStart) / 86400000) + 1)/7);
+}
+
+function getDayKey(date) {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+
+function getMonthKey(date) {
+  const d = new Date(date);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+function loadState() {
+  const s = localStorage.getItem('nexo_agenda');
+  if (s) { try { return JSON.parse(s); } catch(e) {} }
+  return { weeks: {}, history: [] };
+}
+
+function saveState() {
+  localStorage.setItem('nexo_agenda', JSON.stringify(state));
+}
+
+let state = loadState();
+
+// ── Obtener/inicializar semana actual ──
+function getCurrentWeekData() {
+  const wk = getWeekKey(new Date());
+  if (!state.weeks[wk]) {
+    state.weeks[wk] = {};
+    // Inicializar los 5 días
+    for (let d = 0; d < 5; d++) {
+      const tareas = tareasParaDia(d);
+      state.weeks[wk][d] = tareas.map((t, i) => ({ ...t, id: i, done: false }));
+    }
+    saveState();
+  }
+  return state.weeks[wk];
+}
+
+// ── Detectar si hay que resetear (domingo a la noche pasó) ──
+function checkReset() {
+  const now = new Date();
+  const wk = getWeekKey(now);
+  if (!state.weeks[wk]) {
+    archivePreviousWeek();
+  }
+}
+
+function archivePreviousWeek() {
+  const keys = Object.keys(state.weeks).sort();
+  if (keys.length === 0) return;
+  const currentWk = getWeekKey(new Date());
+  // Solo archivar semanas que NO son la actual
+  const toArchive = keys.filter(k => k !== currentWk);
+  toArchive.forEach(lastKey => {
+    const weekData = state.weeks[lastKey];
+    const score = calcWeekScore(weekData);
+    if (!state.history) state.history = [];
+    // Solo archivar si la semana ya terminó (hay al menos una semana más nueva)
+    // Esto evita archivar la semana de instalación
+    if (keys.length > 1 || state.history.length > 0) {
+      state.history.push({ weekKey: lastKey, score, date: new Date().toISOString() });
+    }
+    delete state.weeks[lastKey];
+  });
+  saveState();
+}
+
+function calcWeekScore(weekData) {
+  let total = 0, done = 0;
+  for (let d = 0; d < 5; d++) {
+    if (weekData[d]) {
+      total += weekData[d].length;
+      done += weekData[d].filter(t => t.done).length;
+    }
+  }
+  return total > 0 ? Math.round((done / total) * 100) : 0;
+}
+
+function calcDayScore(dayData) {
+  if (!dayData || dayData.length === 0) return { pct: 0, done: 0, total: 0 };
+  const done = dayData.filter(t => t.done).length;
+  return { pct: Math.round((done / dayData.length) * 100), done, total: dayData.length };
+}
+
+// ══════════════════════════════════════════════════
+// RENDER HOY
+// ══════════════════════════════════════════════════
+function getTodayDayIndex() {
+  const day = new Date().getDay(); // 0=Dom, 1=Lun...
+  if (day === 0 || day === 6) return null; // fin de semana
+  return day - 1; // 0=Lun...4=Vie
+}
+
+function renderHoy() {
+  const now = new Date();
+  const dayIdx = getTodayDayIndex();
+
+  // Título
+  const diasNombres = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
+  document.getElementById('todayName').textContent = diasNombres[now.getDay()];
+  const mesNombre = MESES[now.getMonth()];
+  document.getElementById('todayDate').textContent = ` ${now.getDate()} de ${mesNombre} · ${now.getFullYear()}`;
+
+  const container = document.getElementById('todayBlocks');
+
+  if (dayIdx === null) {
+    container.innerHTML = `<div style="color:var(--gray-400);font-size:14px;padding:40px 0">Es fin de semana. La agenda vuelve el lunes.</div>`;
+    document.getElementById('dayProgressBar').style.width = '0%';
+    document.getElementById('dayScoreLabel').textContent = '—';
+    document.getElementById('dayScoreTasks').textContent = '';
+    return;
+  }
+
+  const weekData = getCurrentWeekData();
+  const dayData = weekData[dayIdx];
+  const { pct, done, total } = calcDayScore(dayData);
+
+  // Progress header
+  document.getElementById('dayProgressBar').style.width = pct + '%';
+  document.getElementById('dayScoreLabel').textContent = pct + '%';
+  document.getElementById('dayScoreTasks').textContent = `${done} de ${total} tareas`;
+
+  // Agrupar por bloque
+  const bloques = {};
+  dayData.forEach(t => {
+    if (!bloques[t.bloque]) bloques[t.bloque] = [];
+    bloques[t.bloque].push(t);
+  });
+
+  container.innerHTML = '';
+  for (const [bloque, items] of Object.entries(bloques)) {
+    const blockEl = document.createElement('div');
+    blockEl.className = 'block';
+    blockEl.innerHTML = `<div class="block-label">${bloque}</div>`;
+    items.forEach(task => {
+      const row = document.createElement('div');
+      row.className = 'item' + (task.done ? ' done' : '');
+      row.innerHTML = `
+        <div class="item-time ${task.hora ? '' : 'no-time'}">${task.hora || '—'}</div>
+        <div class="item-dot"></div>
+        <div class="item-name">${task.nombre}</div>
+        <div class="item-check ${task.done ? 'checked' : ''}" onclick="toggleTask(${dayIdx},${task.id},this)"></div>
+      `;
+      row.onclick = (e) => {
+        if (!e.target.classList.contains('item-check')) {
+          const chk = row.querySelector('.item-check');
+          toggleTask(dayIdx, task.id, chk);
+        }
+      };
+      blockEl.appendChild(row);
+    });
+    container.appendChild(blockEl);
+  }
+}
+
+function toggleTask(dayIdx, taskId, chkEl) {
+  const weekData = getCurrentWeekData();
+  const task = weekData[dayIdx].find(t => t.id === taskId);
+  if (!task) return;
+  task.done = !task.done;
+  saveState();
+  renderHoy();
+}
+
+// ══════════════════════════════════════════════════
+// RENDER SEMANA
+// ══════════════════════════════════════════════════
+function renderSemana() {
+  const now = new Date();
+  const weekData = getCurrentWeekData();
+
+  // Rango de fechas de la semana
+  const lunes = new Date(now);
+  const day = now.getDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  lunes.setDate(now.getDate() + diff);
+  const viernes = new Date(lunes); viernes.setDate(lunes.getDate() + 4);
+  document.getElementById('weekRange').textContent =
+    `${lunes.getDate()} de ${MESES[lunes.getMonth()]} — ${viernes.getDate()} de ${MESES[viernes.getMonth()]}`;
+
+  // Score global
+  const weekScore = calcWeekScore(weekData);
+  document.getElementById('weekScoreNum').textContent = weekScore;
+
+  // Días
+  const grid = document.getElementById('daysGrid');
+  grid.innerHTML = '';
+  const todayIdx = getTodayDayIndex();
+  for (let d = 0; d < 5; d++) {
+    const { pct, done, total } = calcDayScore(weekData[d]);
+    const isToday = d === todayIdx;
+    const row = document.createElement('div');
+    row.className = 'day-row';
+    row.innerHTML = `
+      <div class="dname ${isToday ? 'today' : ''}">${DIAS[d]}${isToday ? ' ·' : ''}</div>
+      <div class="day-bar-wrap"><div class="day-bar" style="width:${pct}%"></div></div>
+      <div class="day-pct ${pct === 0 ? 'zero' : ''}">${pct > 0 ? pct + '%' : '—'}</div>
+    `;
+    grid.appendChild(row);
+  }
+}
+
+function confirmReset() {
+  if (!confirm('¿Resetear la semana actual? Los datos se guardarán en el historial.')) return;
+  const wk = getWeekKey(new Date());
+  const weekData = state.weeks[wk];
+  if (weekData) {
+    const score = calcWeekScore(weekData);
+    if (!state.history) state.history = [];
+    state.history.push({ weekKey: wk, score, date: new Date().toISOString(), manual: true });
+    delete state.weeks[wk];
+    saveState();
+  }
+  renderSemana();
+  renderHoy();
+  alert('Semana reseteada. Podés ver el score en Historial.');
+}
+
+// ══════════════════════════════════════════════════
+// RENDER HISTORIAL
+// ══════════════════════════════════════════════════
+function renderHistorial() {
+  const container = document.getElementById('historialContent');
+  const history = state.history || [];
+
+  if (history.length === 0) {
+    container.innerHTML = `<div class="hist-empty">Todavía no hay semanas archivadas.<br>El historial aparece cuando se completa una semana.</div>`;
+    return;
+  }
+
+  // Agrupar por mes
+  const porMes = {};
+  history.forEach(entry => {
+    // Extraer año y semana del weekKey (YYYY-Www)
+    const [year, ww] = entry.weekKey.split('-W');
+    // Aproximar mes por fecha guardada
+    const d = new Date(entry.date);
+    const mk = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    if (!porMes[mk]) porMes[mk] = [];
+    porMes[mk].push(entry);
+  });
+
+  let html = '';
+  const mesKeys = Object.keys(porMes).sort().reverse();
+
+  for (const mk of mesKeys) {
+    const [yr, mo] = mk.split('-');
+    const mesNombre = MESES[parseInt(mo) - 1] + ' ' + yr;
+    const entries = porMes[mk].sort((a,b) => b.weekKey.localeCompare(a.weekKey));
+    const avgMes = Math.round(entries.reduce((s,e) => s + e.score, 0) / entries.length);
+
+    html += `<div class="hist-section-title">${mesNombre} <span style="font-weight:400;color:var(--blue);margin-left:8px">${avgMes}% promedio</span></div>`;
+
+    entries.forEach(entry => {
+      const wNum = entry.weekKey.split('-W')[1];
+      const d = new Date(entry.date);
+      const label = `Semana ${parseInt(wNum)}`;
+      const pct = entry.score;
+      html += `
+        <div class="hist-row">
+          <div class="hist-label">${label}${entry.manual ? ' <span style="font-size:10px;color:var(--gray-400)">(manual)</span>' : ''}</div>
+          <div class="hist-bar-wrap"><div class="hist-bar" style="width:${pct}%"></div></div>
+          <div class="hist-pct ${pct === 100 ? 'perfect' : ''}">${pct}%</div>
+        </div>`;
+    });
+  }
+
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  document.querySelector(`.nav-tab[onclick="showPage('${name}')"]`).classList.add('active');
+  if (name === 'semana') renderSemana();
+  if (name === 'historial') renderHistorial();
+}
+
+// ══════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════
+checkReset();
+renderHoy();
+</script>
+</body>
+</html>
